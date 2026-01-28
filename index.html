@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refactorizando la Educación - Portafolio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuentes de Google: Press Start 2P (Videojuego) y VT323 (Texto Pixel) y Roboto (Lectura) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&family=VT323&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #5c94fc;
+            /* Cielo Super Mario */
+            background-image:
+                radial-gradient(white 15%, transparent 16%),
+                radial-gradient(white 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Nubes decorativas en el fondo usando CSS */
+        .cloud-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: #5c94fc;
+        }
+
+        h1,
+        h2,
+        h3,
+        .game-font {
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.5;
+        }
+
+        .pixel-font {
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+        }
+
+        /* Cajas estilo NES */
+        .nes-container {
+            background-color: white;
+            border: 4px solid black;
+            position: relative;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .nes-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .nes-container::after {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            border: 2px solid #e5e5e5;
+            pointer-events: none;
+        }
+
+        /* Estilo Tubería */
+        .pipe-header {
+            background: linear-gradient(90deg, #16a308 10%, #58e026 30%, #16a308 60%, #0d6e06 90%);
+            border: 4px solid black;
+            color: white;
+            text-shadow: 2px 2px 0 #000;
+            position: relative;
+            z-index: 20;
+        }
+
+        .pipe-connector {
+            width: 60px;
+            background: linear-gradient(90deg, #16a308 10%, #58e026 30%, #16a308 60%, #0d6e06 90%);
+            border-left: 4px solid black;
+            border-right: 4px solid black;
+            margin: 0 auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            bottom: 0;
+            z-index: 0;
+        }
+
+        /* Bloque ? */
+        .question-block {
+            background-color: #fbbf24;
+            border: 4px solid black;
+            box-shadow: inset -4px -4px 0px #b45309, inset 4px 4px 0px #fcd34d;
+            animation: pulse-block 2s infinite;
+        }
+
+        @keyframes pulse-block {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Ladrillos */
+        .brick-pattern {
+            background-color: #b91c1c;
+            background-image: linear-gradient(335deg, rgba(0, 0, 0, 0.2) 23px, transparent 23px),
+                linear-gradient(155deg, rgba(0, 0, 0, 0.2) 23px, transparent 23px),
+                linear-gradient(335deg, rgba(0, 0, 0, 0.2) 23px, transparent 23px),
+                linear-gradient(155deg, rgba(0, 0, 0, 0.2) 23px, transparent 23px);
+            background-size: 58px 58px;
+            background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
+        }
+
+        .pixel-img {
+            image-rendering: pixelated;
+            border: 4px solid black;
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+    <div class="cloud-bg">
+        <!-- Nubes decorativas SVG -->
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="clouds" x="0" y="0" width="500" height="500" patternUnits="userSpaceOnUse">
+                    <path d="M100,100 Q120,80 140,100 T180,100 T220,100" fill="none" stroke="white" stroke-width="40"
+                        stroke-linecap="round" opacity="0.6" />
+                    <path d="M350,300 Q370,280 390,300 T430,300 T470,300" fill="none" stroke="white" stroke-width="40"
+                        stroke-linecap="round" opacity="0.6" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#clouds)" />
+        </svg>
+    </div>
+
+    <!-- PORTADA / TITLE SCREEN -->
+    <section
+        class="min-h-screen flex flex-col justify-center items-center relative mb-16 -mt-8 mx-auto w-full max-w-5xl">
+
+        <div
+            class="w-full bg-white border-4 border-black p-8 md:p-12 shadow-[15px_15px_0px_rgba(0,0,0,0.2)] text-center relative z-10">
+            <!-- Esquinas con tornillos -->
+            <div class="absolute top-2 left-2 w-3 h-3 bg-black rounded-full"></div>
+            <div class="absolute top-2 right-2 w-3 h-3 bg-black rounded-full"></div>
+            <div class="absolute bottom-2 left-2 w-3 h-3 bg-black rounded-full"></div>
+            <div class="absolute bottom-2 right-2 w-3 h-3 bg-black rounded-full"></div>
+
+            <!-- Header Info -->
+            <div class="flex justify-between items-center mb-8 border-b-4 border-black pb-4 flex-wrap gap-4">
+                <div class="text-left">
+                    <p class="game-font text-xs text-red-600 mb-2">SCORE: 000300</p>
+                    <p class="game-font text-xs">WORLD: 1-1</p>
+                </div>
+                <div class="bg-white p-2 border-2 border-black">
+                    <!-- Usando logo oficial proporcionado -->
+                    <img src="https://moria.aurens.com/organizations/b922aba1-bec3-4ed6-85d1-300a5bbc9e6b/logos/5b250f-17.png"
+                        alt="Logo Universidad Castro Carazo" class="h-16 object-contain"
+                        onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'game-font text-xs\'>CASTRO CARAZO</span>'">
+                </div>
+                <div class="text-right">
+                    <p class="game-font text-xs text-red-600 mb-2">TIME: 2026</p>
+                    <p class="game-font text-xs">COINS: x99</p>
+                </div>
+            </div>
+
+            <!-- Título Principal -->
+            <div class="my-8">
+                <h2 class="game-font text-xl md:text-3xl text-gray-800 mb-2">UNIVERSIDAD CASTRO CARAZO</h2>
+                <div class="inline-block bg-black text-white px-4 py-2 game-font text-xs mb-6 transform -rotate-2">
+                    SEDE CENTRAL | I CUATRIMESTRE
+                </div>
+
+                <h1 class="game-font text-3xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-700 mb-4 drop-shadow-[4px_4px_0_rgba(0,0,0,1)]"
+                    style="-webkit-text-stroke: 1px black;">
+                    PORTAFOLIO<br>SEMANA #3
+                </h1>
+
+                <div
+                    class="bg-yellow-400 border-4 border-black p-4 inline-block transform rotate-1 shadow-[5px_5px_0_rgba(0,0,0,0.5)] mt-4">
+                    <h3 class="game-font text-sm md:text-lg text-black">
+                        MISION: Bitácora de un Ingeniero en la Docencia
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Datos del Jugador -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-0 border-4 border-black mt-8">
+                <div class="p-6 bg-blue-100 border-b-4 md:border-b-0 md:border-r-4 border-black text-left">
+                    <h4 class="game-font text-xs text-blue-800 mb-3"><i class="fas fa-book mr-2"></i>COURSE INFO</h4>
+                    <p class="font-bold mb-1">LD5013 Introducción a la Pedagogía</p>
+                    <p class="text-sm">Prof. Carmen Amelia Ulate Quesada</p>
+                </div>
+                <div class="p-6 bg-green-100 text-left">
+                    <h4 class="game-font text-xs text-green-800 mb-3"><i class="fas fa-user mr-2"></i>PLAYER 1</h4>
+                    <p class="font-bold mb-1 text-lg">Daniel Tijerino Cerón</p>
+                    <p class="text-sm pixel-font">DATE: 30-ENE-2026</p>
+                </div>
+            </div>
+
+            <div class="mt-8 animate-pulse">
+                <p class="game-font text-xs">PRESS START TO LEARN</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenedor Principal -->
+    <main class="max-w-6xl mx-auto relative pt-8">
+        <!-- Tubería Conectora Central -->
+        <div class="pipe-connector hidden md:block h-full"></div>
+
+        <!-- SECCIÓN 1: INTRODUCCIÓN -->
+        <div class="flex flex-col md:flex-row items-center mb-24 relative z-10 px-4">
+            <div class="w-full md:w-1/2 p-4 flex justify-center">
+                <div class="relative">
+                    <div
+                        class="absolute -top-6 -left-6 text-6xl text-yellow-400 drop-shadow-[2px_2px_0_black] animate-bounce">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop"
+                        alt="Start Game" class="pixel-img w-full max-w-sm rounded-lg bg-gray-200">
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 p-4">
+                <div class="nes-container p-6 rounded-lg">
+                    <div class="pipe-header p-3 -mt-10 mx-auto w-3/4 text-center mb-4 rounded shadow-lg">
+                        <h2 class="text-sm md:text-base">NIVEL 1: INTRODUCCIÓN</h2>
+                    </div>
+                    <h3 class="game-font text-lg text-blue-700 mb-4 text-center">Refactorizando el Concepto</h3>
+                    <p class="text-gray-800 leading-relaxed text-justify font-medium">
+                        Mi formación en ingeniería me enseñó a buscar sistemas eficientes y lógicos. Sin embargo, este
+                        curso me ha demostrado que la educación no es un script rígido, sino un sistema vivo y complejo.
+                        A través de las exposiciones de mis compañeros y mi propia investigación, he analizado cómo
+                        hemos pasado de modelos centrados en el "dato" (Racionalismo/Tradicional) a modelos centrados en
+                        el "usuario" (Humanismo/Liberadora/Ternura). Este portafolio documenta ese cambio de paradigma.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: RACIONALISMO -->
+        <div class="flex flex-col md:flex-row-reverse items-center mb-24 relative z-10 px-4">
+            <div class="w-full md:w-1/2 p-4 flex justify-center">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=1000&auto=format&fit=crop"
+                        alt="Racionalismo" class="pixel-img w-full max-w-sm rounded-lg bg-gray-200">
+                    <div
+                        class="absolute -bottom-4 -right-4 bg-white border-4 border-black p-2 game-font text-xs shadow-lg">
+                        <i class="fas fa-brain text-gray-500"></i> LOGIC
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 p-4">
+                <div class="nes-container p-6 rounded-lg bg-gray-50">
+                    <div class="brick-pattern h-8 w-full border-4 border-black mb-4 -mx-6 -mt-6 w-[calc(100%+3rem)]">
+                    </div>
+
+                    <div class="flex items-center mb-4">
+                        <div class="question-block w-12 h-12 flex items-center justify-center text-2xl mr-4 shrink-0">
+                            ?
+                        </div>
+                        <h2 class="game-font text-sm md:text-lg text-gray-800">2. Evidencia 1:<br>El Racionalismo</h2>
+                    </div>
+
+                    <h3 class="pixel-font text-gray-500 mb-2 border-b-2 border-gray-300">RESUMEN DEL MODELO</h3>
+                    <p class="text-gray-700 mb-6 text-justify">
+                        El grupo explicó cómo el Racionalismo, con figuras como Descartes, establece que la razón es la
+                        única fuente válida de conocimiento, desconfiando de los sentidos. Se basa en el método
+                        deductivo y en ideas innatas.
+                    </p>
+
+                    <div class="bg-blue-100 border-l-4 border-blue-500 p-4">
+                        <h3 class="game-font text-xs text-blue-700 mb-2"><i class="fas fa-wrench mr-2"></i>PERSPECTIVA
+                            INGENIERIL</h3>
+                        <p class="text-gray-800 text-sm text-justify">
+                            Entiendo este modelo como el <strong>"código base"</strong> de la modernidad. Su aporte fue
+                            el orden y la lógica; sin embargo, al aplicarse a la educación, generó una desconexión
+                            crítica. Al priorizar solo la mente racional ("pienso, luego existo"), el sistema educativo
+                            ignoró durante siglos que el estudiante también "siente" y "experimenta". Es un sistema
+                            robusto, pero carece de interfaz amigable con la realidad humana.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: HUMANISMO -->
+        <div class="flex flex-col md:flex-row items-center mb-24 relative z-10 px-4">
+            <div class="w-full md:w-1/2 p-4 flex justify-center">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1000&auto=format&fit=crop"
+                    alt="Humanismo" class="pixel-img w-full max-w-sm rounded-lg bg-gray-200">
+            </div>
+            <div class="w-full md:w-1/2 p-4">
+                <div class="nes-container p-6 rounded-lg bg-orange-50">
+                    <div class="pipe-header p-2 -mt-10 ml-auto w-1/2 text-center mb-4 rounded shadow-lg bg-orange-500"
+                        style="background: #fb923c;">
+                        <span class="text-xs game-font">USER CENTERED</span>
+                    </div>
+
+                    <div class="flex items-center mb-4">
+                        <div class="text-orange-500 text-3xl mr-3">
+                            <i class="fas fa-heart animate-pulse"></i>
+                        </div>
+                        <h2 class="game-font text-sm md:text-lg text-orange-600">3. Evidencia 2:<br>Humanismo</h2>
+                    </div>
+
+                    <h3 class="pixel-font text-gray-500 mb-2">RESUMEN</h3>
+                    <p class="text-gray-700 mb-6 text-justify">
+                        Esta corriente, impulsada por Carl Rogers y Abraham Maslow, cambia la arquitectura del sistema:
+                        el estudiante pasa al centro. Se busca el desarrollo integral (emocional + intelectual).
+                    </p>
+
+                    <h3 class="game-font text-xs text-orange-600 mb-2"><i class="fas fa-gamepad mr-2"></i>REFLEXIÓN (UX)
+                    </h3>
+                    <p class="text-gray-800 text-justify border-2 border-orange-200 p-3 rounded bg-white">
+                        Lo más rescatable aquí es el concepto de <strong>autonomía</strong>. Como vimos en los ejemplos,
+                        permitir que un estudiante elija su libro de lectura aumenta su "engagement" o compromiso. Para
+                        mí, el Humanismo es la primera actualización de <strong>"Experiencia de Usuario (UX)"</strong>
+                        en la educación: si el usuario no se siente bien, no aprende.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: PEDAGOGÍA LIBERADORA -->
+        <div class="flex flex-col md:flex-row-reverse items-center mb-24 relative z-10 px-4">
+            <div class="w-full md:w-1/2 p-4 flex justify-center">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop"
+                    alt="Liberadora" class="pixel-img w-full max-w-sm rounded-lg bg-gray-200">
+            </div>
+            <div class="w-full md:w-1/2 p-4">
+                <div class="nes-container p-6 rounded-lg bg-green-50">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-comment-dots text-green-600 text-3xl mr-4"></i>
+                        <h2 class="game-font text-sm md:text-lg text-green-700">4. Evidencia 3:<br>Café Liberador</h2>
+                    </div>
+
+                    <p class="text-gray-700 mb-6 text-justify">
+                        Keyleen nos presentó la Pedagogía Liberadora de Paulo Freire mediante un menú de "bebidas de
+                        conocimiento". Contrastó la "educación bancaria" (donde el docente deposita datos en una mente
+                        pasiva) con la educación liberadora, que utiliza el diálogo y la problematización para
+                        transformar la realidad.
+                    </p>
+
+                    <div
+                        class="bg-black text-green-400 p-4 font-mono text-sm border-4 border-green-700 rounded shadow-md">
+                        <p class="mb-2">// ANÁLISIS CRÍTICO (OPEN SOURCE)</p>
+                        <p>La crítica a la educación bancaria resuena conmigo: llenar un disco duro de datos no es
+                            educar. La propuesta de los "Círculos de Cultura" se asemeja mucho al modelo <strong>Open
+                                Source</strong>: el conocimiento se construye en comunidad.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: TERNURA -->
+        <div class="flex flex-col md:flex-row items-center mb-24 relative z-10 px-4">
+            <div class="w-full md:w-1/2 p-4 flex justify-center">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop"
+                        alt="Ternura" class="pixel-img w-full max-w-sm rounded-lg bg-gray-200">
+                    <div class="absolute -top-4 -right-4 text-4xl text-pink-500 drop-shadow-md">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 p-4">
+                <div class="nes-container p-6 rounded-lg bg-pink-50">
+                    <div class="flex items-center mb-4">
+                        <h2 class="game-font text-sm md:text-lg text-pink-600">5. Evidencia 4:<br>Pedagogía de la
+                            Ternura</h2>
+                    </div>
+
+                    <p class="text-gray-700 mb-6 text-justify">
+                        Esta exposición definió la ternura no como sentimentalismo, sino como una categoría política y
+                        ética. Precursores como Cussiánovich y Turner proponen educar desde el afecto, transformando el
+                        error en oportunidad.
+                    </p>
+
+                    <h3 class="game-font text-xs text-pink-600 mb-2">DEBUGGING & SANDBOX</h3>
+                    <p class="text-gray-800 text-justify">
+                        Como ingeniero, solía ver el error como un fallo del sistema. Esta pedagogía me enseñó que el
+                        error es un dato valioso (<strong>debugging</strong>). La ternura actúa como un entorno seguro
+                        (<strong>sandbox</strong>) donde el estudiante puede equivocarse sin miedo a ser "borrado".
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 6: ESCUELA AMABLE -->
+        <div class="flex flex-col md:flex-row-reverse items-center mb-24 relative z-10 px-4">
+            <div class="w-full md:w-1/2 p-4 flex justify-center">
+                <img src="https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?q=80&w=1000&auto=format&fit=crop"
+                    alt="Fútbol" class="pixel-img w-full max-w-sm rounded-lg bg-gray-200">
+            </div>
+            <div class="w-full md:w-1/2 p-4">
+                <div class="nes-container p-6 rounded-lg bg-teal-50">
+                    <div class="pipe-header p-2 -mt-10 mx-auto w-2/3 text-center mb-4 rounded shadow-lg bg-teal-500"
+                        style="background: #14b8a6;">
+                        <span class="text-xs game-font">MULTIPLAYER MODE</span>
+                    </div>
+
+                    <h2 class="game-font text-sm md:text-lg text-teal-700 mb-4 text-center">6. Evidencia 5:<br>"La
+                        Escuela Amable"</h2>
+
+                    <ul class="space-y-4">
+                        <li
+                            class="flex items-start bg-white p-3 border-2 border-black rounded shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
+                            <i class="fas fa-futbol text-teal-500 mt-1 mr-3"></i>
+                            <div>
+                                <strong class="game-font text-xs block mb-1">Estrategia</strong>
+                                <span class="text-sm text-gray-600">Cuento narrativo sobre inclusión en el
+                                    fútbol.</span>
+                            </div>
+                        </li>
+                        <li
+                            class="flex items-start bg-white p-3 border-2 border-black rounded shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
+                            <i class="fas fa-mobile-alt text-teal-500 mt-1 mr-3"></i>
+                            <div>
+                                <strong class="game-font text-xs block mb-1">Tecnología</strong>
+                                <span class="text-sm text-gray-600">Implementaron Kahoot! para validar valores
+                                    (Gamificación).</span>
+                            </div>
+                        </li>
+                        <li
+                            class="flex items-start bg-white p-3 border-2 border-black rounded shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
+                            <i class="fas fa-check text-teal-500 mt-1 mr-3"></i>
+                            <div>
+                                <strong class="game-font text-xs block mb-1">Conclusión</strong>
+                                <span class="text-sm text-gray-600">Un "clima escolar positivo" es un requisito técnico
+                                    para que el sistema no se bloquee.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 7: COMPARATIVA -->
+        <div class="mb-24 relative z-10 w-full px-4">
+            <div class="bg-white border-4 border-black p-8 shadow-[10px_10px_0px_rgba(0,0,0,0.2)]">
+                <div class="text-center mb-8">
+                    <h2 class="game-font text-xl md:text-2xl text-purple-700">7. VS BATTLE: Tradicional vs. Nueva</h2>
+                    <p class="pixel-font text-gray-500">SÍNTESIS DE MI INVESTIGACIÓN</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Tradicional -->
+                    <div class="bg-red-50 p-6 border-4 border-black relative grayscale hover:grayscale-0 transition">
+                        <div
+                            class="absolute -top-4 -left-4 bg-red-600 text-white px-2 py-1 game-font text-xs border-2 border-black">
+                            OLD VER.</div>
+                        <h4 class="game-font text-sm mb-4 mt-2">ESCUELA TRADICIONAL</h4>
+                        <p class="text-xs text-gray-500 mb-2 font-mono">DEV: Herbart, Durkheim</p>
+                        <p class="text-gray-700 text-sm mb-4">Busca estandarizar. Ve al niño como adulto en miniatura.
+                        </p>
+                        <div class="bg-red-200 p-2 text-xs font-bold text-red-800 border-2 border-red-400">
+                            BUG: Procesamiento por lotes (Batch).
+                        </div>
+                    </div>
+
+                    <!-- Nueva -->
+                    <div class="bg-green-50 p-6 border-4 border-black relative transform scale-105 shadow-xl">
+                        <div
+                            class="absolute -top-4 -right-4 bg-green-500 text-white px-2 py-1 game-font text-xs border-2 border-black animate-pulse">
+                            NEW UPDATE!</div>
+                        <h4 class="game-font text-sm mb-4 mt-2 text-green-800">ESCUELA NUEVA</h4>
+                        <p class="text-xs text-gray-500 mb-2 font-mono">DEV: Dewey, Montessori</p>
+                        <p class="text-gray-700 text-sm mb-4">Aprendizaje activo. El aula es un laboratorio.</p>
+                        <div class="bg-green-200 p-2 text-xs font-bold text-green-800 border-2 border-green-400">
+                            PATCH: Sistema personalizado y activo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 8: GAMIFICACIÓN Y CIERRE -->
+        <div class="flex flex-col md:flex-row items-stretch mb-24 relative z-10 gap-6 px-4">
+
+            <!-- Gamificación -->
+            <div class="w-full md:w-1/3">
+                <div class="question-block h-full p-6 flex flex-col justify-between text-center">
+                    <div>
+                        <i class="fas fa-trophy text-5xl text-white drop-shadow-[2px_2px_0_black] mb-4"></i>
+                        <h2 class="game-font text-sm text-black mb-4">8. GAMIFICACIÓN</h2>
+                        <ul class="text-left bg-white/50 p-4 border-2 border-black text-sm font-bold">
+                            <li class="mb-2"><i class="fas fa-check mr-2"></i>Positivismo = Datos medibles.</li>
+                            <li><i class="fas fa-check mr-2"></i>Constructivismo = Contexto cultural.</li>
+                        </ul>
+                    </div>
+                    <p class="game-font text-xs mt-4">LEVEL COMPLETE!</p>
+                </div>
+            </div>
+
+            <!-- Conclusión Final -->
+            <div class="w-full md:w-2/3">
+                <div class="bg-white border-4 border-black p-8 h-full shadow-[8px_8px_0_#333]">
+                    <h2 class="game-font text-lg text-black mb-6 border-b-4 border-black pb-2">
+                        GAME OVER / RESULTADOS
+                    </h2>
+                    <p class="text-gray-600 italic mb-6">Mi visión de la docencia se ha transformado:</p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-blue-500 border-2 border-black mr-3"></div>
+                            <div>
+                                <strong class="game-font text-xs block">INTEGRACIÓN</strong>
+                                <span class="text-sm">Lógica + Empatía + Conciencia Social.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-green-500 border-2 border-black mr-3"></div>
+                            <div>
+                                <strong class="game-font text-xs block">ROL DOCENTE</strong>
+                                <span class="text-sm">De "Arquitecto" a "Facilitador" del sistema.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-red-500 border-2 border-black mr-3"></div>
+                            <div>
+                                <strong class="game-font text-xs block">CÓDIGO ÉTICO</strong>
+                                <span class="text-sm">Técnica sin humanismo es ciega. Calidad = Relaciones
+                                    Humanas.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center p-8 bg-black text-white mt-12 border-t-4 border-white">
+        <p class="game-font text-xs mb-2">THANK YOU MARIO!</p>
+        <p class="text-xs text-gray-400">BUT OUR PRINCESS IS IN ANOTHER CASTLE</p>
+        <p class="text-xs mt-4 pixel-font">© 2026 Daniel Tijerino - Portafolio Semana #3</p>
+    </footer>
+
+</body>
+
+</html>
